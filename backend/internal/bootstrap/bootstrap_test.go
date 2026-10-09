@@ -456,7 +456,7 @@ func TestApplicationOptionsValidate(t *testing.T) {
 	appCtx, cancelApp := context.WithCancel(t.Context())
 	defer cancelApp()
 
-	err := fx.ValidateApp(applicationOptions(
+	err := fx.ValidateApp(ApplicationOptions(
 		appCtx,
 		&config.Config{},
 		(*database.DB)(nil),

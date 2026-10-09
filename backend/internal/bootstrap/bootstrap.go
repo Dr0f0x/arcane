@@ -72,7 +72,7 @@ func Bootstrap(ctx context.Context) error {
 	appCtx, cancelApp := context.WithCancel(ctx)
 	appCtx = utils.WithAppLifecycleContext(appCtx)
 
-	db, err := initializeDBAndMigrateInternal(appCtx, cfg)
+	db, err := InitializeDBAndMigrateInternal(appCtx, cfg)
 	if err != nil {
 		cancelApp()
 		return fmt.Errorf("failed to initialize database: %w", err)
@@ -84,7 +84,7 @@ func Bootstrap(ctx context.Context) error {
 		}
 	}()
 
-	app := fx.New(applicationOptions(appCtx, cfg, db, cancelApp))
+	app := fx.New(ApplicationOptions(appCtx, cfg, db, cancelApp))
 
 	startCtx, cancelStart := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancelStart()
@@ -109,7 +109,7 @@ func Bootstrap(ctx context.Context) error {
 	return nil
 }
 
-func applicationOptions(appCtx context.Context, cfg *config.Config, db *database.DB, cancelApp context.CancelFunc) fx.Option {
+func ApplicationOptions(appCtx context.Context, cfg *config.Config, db *database.DB, cancelApp context.CancelFunc) fx.Option {
 	return fx.Options(
 		fx.Supply(cfg, db, cancelApp),
 		fx.Provide(
@@ -492,7 +492,7 @@ func handleAgentBootstrapPairing(ctx context.Context, cfg *config.Config, httpCl
 	}
 }
 
-func initializeDBAndMigrateInternal(ctx context.Context, cfg *config.Config) (*database.DB, error) {
+func InitializeDBAndMigrateInternal(ctx context.Context, cfg *config.Config) (*database.DB, error) {
 	db, err := database.Initialize(ctx, cfg.DatabaseURL, database.MigrationOptions{
 		AllowDowngrade: cfg.AllowDowngrade,
 	})
